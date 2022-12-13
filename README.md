@@ -1,12 +1,15 @@
-# BigSpicy - Merging SPEF, Verilog and Spice information into Circuit protobuf and generating the spice file
-This repo shows the steps for merging the SPEF, verilog and spice netlist into a circuit protobuf and generating the spice file of the design which can further be used to perform various tests and analysis.
-In this repo, I have used the design of sequence detector implemented using SKY130 PDKS. The RTL to GDS2 flow of the given design can be referred from the following github repo.
+# BigSpicy 
+Bigspicy is a tool for merging circuit descriptions (netlists), generating Spice decks modeling those circuits, generating Spice tests to measure those models, and analyzing the results of running Spice on those tests. Bigspicy allows you to combine structural Verilog from a PDK, Spice models of standard cells, a structural Verilog model of some circuit implemented in that PDK, and parasitics extracted into SPEF format. You can then reason about the electrical structure of the design however you want.
+
+Bigspicy generates Spice decks in Xyce format, though this can (and should) be extended to other Spice dialects.
+
+This repo shows the steps for merging the SPEF, verilog and spice netlist into a circuit protobuf and generating the spice file of the design which can further be used to perform various tests and analysis.In this repo, I have used the design of sequence detector implemented using SKY130 PDKS. The RTL to GDS2 flow of the given design can be referred from the following github repo.
 https://github.com/Anujjha1031/iiitb_sqd_1010
 
-# FLOWCHART :
+# Flowchart
 ![206892403-9238ee48-5b2f-43e7-86d4-9f81d6f67f62](https://user-images.githubusercontent.com/110462872/207245440-fed833ad-ef2f-47e1-8743-348cc5778217.png)
 
-# PREREQUISITES :
+# Prerequisites/Tools
 To install the python dependencies, follow the below steps:
 
 ```
@@ -29,11 +32,17 @@ protoc proto/*.proto --python_out=.
 
 We also need tools like Xyce and XDM installed.
 To install the mentioned tools use the following links:
-XYCE:
+
+XDM: Primitives and spice files are needed by BigSpicy but they are not processed in their raw format. The files that are fed to BigSpicy should be in Xyce format as minimal internal processing is required for them.
+
+XDM can be installed from the below link
+https://github.com/Xyce/XDM
+
+XYCE: After obtaining all the required files, SKY130 Primitives and Spice files in Xyce format, netlist and spice files. We need to merge them as in order to generate a spice deck the order of ports for each instantiated module are also required which leads to dependency on PDK. We then convert the merged files into protobuf with the help of protoc.
+
+Xyce can be installed from the below link
 https://xyce.sandia.gov/documentation/BuildingGuide.html
 
-XDM:
-https://github.com/Xyce/XDM
 
 # Converting the PDKs:
 First step is to convert the PDKs into Xyce format.
@@ -65,6 +74,7 @@ This will generate final.pb file.
 To specify the location of the final.pb file, go to bigspicy.py file and search for "def withoptions()" function. Change the "output_dir" variable to your desired path.
 
 # Generating whole-module spice file
+The protobuf file that we have generated in the previous step and PDK spice file are then used to make a whole module spice model. We then pass the --flatten_spice argument to convert the whole module spice model into transistor level spice.
 After generating the "final.pb" file, we now generate the spice file("spice.sp" in this case) for our design which can be further used to run tests.
 This step takes the pdks, and the design as input and gives the spice file as output.
 To generate the spice file, follow the below steps in BigSpicy directory:
@@ -84,12 +94,45 @@ To generate the spice file, follow the below steps in BigSpicy directory:
 
 The above steps will generate "spice.sp" file in the mentioned directory.
 
+# Generating test to measure input capacitance
+We take the protobuf file, PDK primitives file and the spice file of our module to generate the test manifest and circuit analysis protobuf files. We then run Xyce to perform tests.
+
+Capacitances is an important parameter for any chip that we design. The propagation delays of a circuit depend on the capacitances of each and every standard cell.propagation delay is the amount of time it takes for signals to pass between two Flip-Flops.
+In order to make a chip work faster, we want the worst case delay to be as minimum as possible without violating the setup and hold time. The setup and hold time are maintained so that the clock is not running faster than the logic allows.
+
+# Setup and Hold Time
+In digital designs, each and every flip-flop has some restrictions related to the data with respect to the clock in the form of windows in which data can change or not. There is always a region around the clock edge in which input data should not change at the input of the flip-flop. This is because, if the data changes within this window, we cannot guarantee the output.
+
+Setup Time: Setup time is the amount of time required for the input to a Flip-Flop to be stable before a clock edge.
+
+Hold TIme: Hold time is the minimum amount of time required for the input to a Flip-Flop to be stable after a clock edge.
+
+![201023386-a0506ab5-a057-4626-b28b-656e86990351](https://user-images.githubusercontent.com/110462872/207331272-04fea3c0-d113-4e9e-87ba-d9d467566fee.png)
+
+Setup time and hold time are said to be the backbone of timing analysis. Rightly so, for the chip to function properly, setup and hold timing constraints need to be met properly for each and every flip-flop in the design. If even a single flop exists that does not meet setup and hold requirements for timing paths starting from/ending at it, the design will fail and meta-stability will occur.
+
+# Measuring Input Capacitance in BigSpicy
+Input Files to these steps
+"Final.pb", Spice file for our design
+Output File
+All necessary test files, "test_manifest.pb", "circuit_analysis.pb"
+
+# Running Xyce to perform tests
+# Linear and transient analysis
+We then perform the linear and transient analysis using Xyce with the help of test manifest and circuit analysis protobuf files.
+
+# Generating wire and whole module tests
+We take the protobuf file, primitives, spice, test manifest and circuit analysis file to generate test for whole module.
+
+# Perform analysis on wire and whole module tests
+We take Final.pb, PDK primitives, test_manifest, test_analysis, PDK spice decks. Input capacitance and delays will be analysed.
+
 # Future Works
 Presently we are working on performing tests on the generated spice file "spice.sp".
 We are trying to find the path delay for few paths using Xyce and compare the same with other available tools.
 We expect this to be a lot faster method for timing analysis than the other tools available now.
 
-# ACKNOWLEDGMENTS
+# Acknowlwdgements
 * Kunal Ghosh, Director, VSD Corp. Pvt. Ltd.
 * Madhav Rao, Professor, IIIT-Bangalore
 * Nanditha Rao, Professor, IIIT-Bangalore
