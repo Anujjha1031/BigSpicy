@@ -8,14 +8,16 @@ https://github.com/Anujjha1031/iiitb_sqd_1010
 
 # PREREQUISITES :
 To install the python dependencies, follow the below steps:
-~
+
+``
 git clone https://github.com/Anujjha1031/BigSpicy
 cd BigSpicy/
 sudo apt-get update
 pip install -e ".[dev]"
 pip install -r requirements.txt
 sudo apt install -y protobuf-compiler iverilog
-~
+``
+
 Another prerequisite for this step is to compile protobufs into python file.(_pb2.py).
 To compile the protobufs, type the below command in terminal in the BigSpicy(cloned_repo) directory:
 
@@ -41,15 +43,16 @@ To merge the files, follow the below steps in the BigSpicy directory:
 
 ./bigspicy.py \
    --import \
-   --spef example_inputs/iiitb_3bit_rc/iiitb_3bit_rc.spef \
+   --spef example_inputs/iiitb_sqd_1010/iiitb_sqd_1010.spef \
    --spice lib/sky130_fd_sc_hd.spice \
-   --verilog example_inputs/iiitb_3bit_rc/iiitb_3bit_rc.v \
+   --verilog example_inputs/iiitb_sqd_1010/iiitb_sqd_1010.v \
    --spice_header lib/sky130_fd_pr__pfet_01v8.pm3.spice \
    --spice_header lib/sky130_fd_pr__nfet_01v8.pm3.spice \
    --spice_header lib/sky130_ef_sc_hd__decap_12.spice \
    --spice_header lib/sky130_fd_pr__pfet_01v8_hvt.pm3.spice \
-   --top iiitb_3bit_rc \
+   --top iiitb_sqd_1010 \
    --save final.pb \
+   
 This will generate final.pb file.
 To specify the location of the final.pb file, go to bigspicy.py file and search for "def withoptions()" function. Change the "output_dir" variable to your desired path.
 
@@ -59,14 +62,14 @@ This step takes the pdks, and the design as input and gives the spice file as ou
 To generate the spice file, follow the below steps in BigSpicy directory:
 
 ./bigspicy.py --import \
-    --verilog example_inputs/iiitb_3bit_rc/iiitb_3bit_rc.v \
+    --verilog example_inputs/iiitb_3bit_rc/iiitb_sqd_1010v \
     --spice lib/sky130_fd_sc_hd.spice \
     --spice_header lib/sky130_fd_pr__pfet_01v8.pm3.spice \
     --spice_header lib/sky130_fd_pr__nfet_01v8.pm3.spice \
     --spice_header lib/sky130_ef_sc_hd__decap_12.spice \
     --spice_header lib/sky130_fd_pr__pfet_01v8_hvt.pm3.spice \
     --save final.pb \
-    --top iiitb_3bit_rc \
+    --top iiitb_sqd_1010 \
     --flatten_spice --dump_spice spice.sp
 The above steps will generate "spice.sp" file in the mentioned directory.
 
