@@ -83,7 +83,7 @@ To generate the spice file, follow the below steps in BigSpicy directory:
 
 ```
 ./bigspicy.py --import \
-    --verilog example_inputs/iiitb_3bit_rc/iiitb_sqd_1010v \
+    --verilog example_inputs/iiitb_sqd_1010/iiitb_sqd_1010.v \
     --spice lib/sky130_fd_sc_hd.spice \
     --spice_header lib/sky130_fd_pr__pfet_01v8.pm3.spice \
     --spice_header lib/sky130_fd_pr__nfet_01v8.pm3.spice \
