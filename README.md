@@ -96,16 +96,10 @@ To generate the spice file, follow the below steps in BigSpicy directory:
 
 The above steps will generate "spice.sp" file in the mentioned directory.
 
+# Running Xyce to perform tests
+
 # Generating test to measure input capacitance
 We take the protobuf file, PDK primitives file and the spice file of our module to generate the test manifest and circuit analysis protobuf files. We then run Xyce to perform tests.
-
-# Measuring Input Capacitance in BigSpicy
-Input Files to these steps
-"Final.pb", Spice file for our design
-Output File
-All necessary test files, "test_manifest.pb", "circuit_analysis.pb"
-
-# Running Xyce to perform tests
 
 # Measuring Input Capacitance in BigSpicy
 Input Files to these steps
