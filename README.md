@@ -106,6 +106,13 @@ Output File
 All necessary test files, "test_manifest.pb", "circuit_analysis.pb"
 
 # Running Xyce to perform tests
+
+# Measuring Input Capacitance in BigSpicy
+Input Files to these steps
+"Final.pb", Spice file for our design
+Output File
+All necessary test files, "test_manifest.pb", "circuit_analysis.pb"
+
 # Linear and transient analysis
 We then perform the linear and transient analysis using Xyce with the help of test manifest and circuit analysis protobuf files.
 
